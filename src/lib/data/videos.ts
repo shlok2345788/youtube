@@ -15,7 +15,7 @@ const TEST_VIDEO_URLS = {
 };
 
 // 🟢 EXPORT the full array of video objects for use in other components.
-const ALL_VIDEOS = [
+export const ALL_VIDEOS = [
   {
     _id: "1",
     videotitle: "Amazing Nature Documentary ",
