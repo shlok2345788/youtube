@@ -1,0 +1,6 @@
+{
+  "installCommand": "if [ -f youtube/package.json ]; then cd youtube && npm ci; else npm ci; fi",
+  "buildCommand": "if [ -f youtube/package.json ]; then cd youtube && npm run build; else npm run build; fi",
+  "devCommand": "if [ -f youtube/package.json ]; then cd youtube && npm run dev; else npm run dev; fi"
+}
+

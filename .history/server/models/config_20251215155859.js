@@ -1,0 +1,1 @@
+const DBURL = process.env.DBURL

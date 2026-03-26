@@ -1,0 +1,40 @@
+import React from 'react'
+import { useState } from "react";
+Looking at the error and the context, the issue is with the import path for the Button component.The current import uses "@/components/ui/button" which appears to be incorrect.Based on the file structure and common React project conventions, this should likely be a relative import or use the correct alias path.
+
+    import { Button } from "../ui/button";
+
+
+const CategoryTabs = () => {
+    const categories = [
+        "All",
+        "Music",
+        "Gaming",
+        "Movies",
+        "News",
+        "Sports",
+        "Technology",
+        "Comedy",
+        "Education",
+        "Science",
+        "Travel",
+        "Food",
+        "Fashion",
+    ]
+    const [activeCategory, setactiveCategory] = useState('All');
+
+    return (
+        <div className="flex  gap-2 mb-6 overflow-x-auto pt-2">
+            {categories.map((category) => (
+                <Button key={category}
+                    variant={activeCategory === category ? 'default' : 'secondary'}
+                    onClick={() => setactiveCategory(category)}
+                    className=' '>
+                    {category}
+                </Button>
+            ))}
+        </div>
+    )
+}
+
+export default CategoryTabs

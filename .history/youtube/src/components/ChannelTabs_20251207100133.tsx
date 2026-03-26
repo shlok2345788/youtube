@@ -1,0 +1,9 @@
+import { useState } from "react"
+
+const ChannelTabs = () => {
+  return (
+    <div></div>
+  )
+}
+
+export default ChannelTabs

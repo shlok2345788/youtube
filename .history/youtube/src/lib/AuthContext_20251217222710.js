@@ -1,0 +1,106 @@
+import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+// signInWithPopup → Google login popup
+// signOut → logout user
+// onAuthStateChanged → detect login even after refresh
+
+import { useState } from "react";
+import { createContext } from "react";
+import { provider, auth } from "./firebase";
+import axiosInstance from "./axiosinstance"; //Used to talk to your backend API
+import { useEffect, useContext } from "react";
+
+const UserContext = createContext(); //enable us to use data globally
+
+export const UserProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+
+  const login = (userdata) => {
+    //LOGIN FUNCTION
+    setUser(userdata);
+    localStorage.setItem("user", JSON.stringify(userdata));
+  };
+  const updateUser = (updates) => {
+    //UPDATE USER FUNCTION - for updating user data like channel name
+    setUser((prev) => {
+      const updated = { ...prev, ...updates };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+  };
+  const logout = async () => {
+    //LOGOUT FUNCTION
+    setUser(null);
+    localStorage.removeItem("user");
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error during sign out:", error);
+    }
+  };
+  const handlegooglesignin = async () => {
+    //GOOGLE SIGN-IN FUNCTION
+    try {
+      const result = await signInWithPopup(auth, provider);
+      //   Opens Google popup  , User selects Google account
+      const firebaseuser = result.user;
+      //Firebase gives logged-in user info
+      const payload = {
+        email: firebaseuser.email,
+        name: firebaseuser.displayName,
+        image: firebaseuser.photoURL || "https://github.com/shadcn.png",
+      };
+      const response = await axiosInstance.post("/user/login", payload);
+      login(response.data.result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  //   AUTO LOGIN
+  useEffect(() => {
+    const unsubcribe = onAuthStateChanged(auth, async (firebaseuser) => {
+      //FireBase Listener
+      //Fires when:
+      // user logs in
+      // page refreshes
+      // app opens again
+      if (firebaseuser) {
+        // user is still loged in and firebase session is still valid
+        try {
+          const payload = {
+            email: firebaseuser.email,
+            name: firebaseuser.displayName,
+            image: firebaseuser.photoURL || "https://github.com/shadcn.png",
+          };
+          const response = await axiosInstance.post("/user/login", payload);
+          login(response.data.result);
+        } catch (error) {
+          console.error(error);
+          logout();
+        }
+      }
+    });
+    return () => unsubcribe();
+  }, []);
+
+  return (
+    <UserContext.Provider
+      value={{ user, login, logout, handlegooglesignin, updateUser }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+export const useUser = () => useContext(UserContext);
+
+// User clicks Google Login
+// ↓
+// Firebase authenticates
+// ↓
+// User info sent to backend
+// ↓
+// Backend returns user data
+// ↓
+// Context stores user
+// ↓
+// User stays logged in after refresh
