@@ -6,6 +6,8 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Progress } from "./ui/progress";
 
+const DEFAULT_BACKEND_URL = "https://youtube-00w8.onrender.com";
+
 interface VideoUploaderProps {
   channelId: string;
   channelName: string;
@@ -79,7 +81,7 @@ const VideoUploader = ({ channelId, channelName }: VideoUploaderProps) => {
 
       const uploadUrl =
         process.env.NEXT_PUBLIC_UPLOAD_URL || 
-        "http://localhost:5000/user/video/upload";
+        `${process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL}/user/video/upload`;
 
       // Use XMLHttpRequest for upload progress tracking
       await new Promise<void>((resolve, reject) => {
