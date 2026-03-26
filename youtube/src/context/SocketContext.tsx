@@ -23,8 +23,14 @@ interface SocketContextType {
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
-// const socket = io('http://127.0.0.1:5000'); // Check PORT
-const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:5000');
+const isLocalHost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+const backendSocketUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (isLocalHost ? 'http://127.0.0.1:5000' : '');
+const socket: Socket | null = backendSocketUrl
+    ? io(backendSocketUrl, { transports: ['websocket', 'polling'] })
+    : null;
 
 
 const ContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -60,14 +66,26 @@ const ContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) 
     };
 
     useEffect(() => {
+        if (!socket) return;
+
         socket.on('me', (id) => setMe(id));
 
         socket.on('callUser', ({ from, name: callerName, signal }) => {
             setCall({ isReceivingCall: true, from, name: callerName, signal });
         });
+
+        return () => {
+            socket.off('me');
+            socket.off('callUser');
+        };
     }, []);
 
     const answerCall = () => {
+        if (!socket) {
+            console.warn('Socket server URL is not configured. Set NEXT_PUBLIC_BACKEND_URL.');
+            return;
+        }
+
         setCallAccepted(true);
 
         const peer = new Peer({ initiator: false, trickle: false, stream });
@@ -88,6 +106,11 @@ const ContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) 
     };
 
     const callUser = (id: string) => {
+        if (!socket) {
+            console.warn('Socket server URL is not configured. Set NEXT_PUBLIC_BACKEND_URL.');
+            return;
+        }
+
         const peer = new Peer({ initiator: true, trickle: false, stream });
 
         peer.on('signal', (data) => {

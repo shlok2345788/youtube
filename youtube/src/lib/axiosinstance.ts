@@ -1,8 +1,14 @@
 import axios from "axios";
 
+const isLocalHost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (isLocalHost ? "http://127.0.0.1:5000" : "");
+
 // Create axios instance with default config
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000",
+  baseURL: backendBaseUrl || undefined,
   timeout: 30000, // 30 seconds
   headers: {
     "Content-Type": "application/json",

@@ -5,7 +5,7 @@ export const getGeoLocation = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-    const response = await fetch("https://ipapi.co/json/", { signal: controller.signal });
+    const response = await fetch("/api/geolocation", { signal: controller.signal });
     clearTimeout(timeoutId);
 
     if (!response.ok) {
