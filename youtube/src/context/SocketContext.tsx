@@ -23,11 +23,13 @@ interface SocketContextType {
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
+const DEFAULT_BACKEND_URL = 'https://youtube-00w8.onrender.com';
+
 const isLocalHost =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-const backendSocketUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (isLocalHost ? 'http://127.0.0.1:5000' : '');
+const backendSocketUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (isLocalHost ? 'http://127.0.0.1:5000' : DEFAULT_BACKEND_URL);
 const socket: Socket | null = backendSocketUrl
     ? io(backendSocketUrl, { transports: ['websocket', 'polling'] })
     : null;

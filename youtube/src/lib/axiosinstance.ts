@@ -1,10 +1,12 @@
 import axios from "axios";
 
+const DEFAULT_BACKEND_URL = "https://youtube-00w8.onrender.com";
+
 const isLocalHost =
   typeof window !== "undefined" &&
   (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
-const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (isLocalHost ? "http://127.0.0.1:5000" : "");
+const backendBaseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (isLocalHost ? "http://127.0.0.1:5000" : DEFAULT_BACKEND_URL);
 
 // Create axios instance with default config
 const axiosInstance = axios.create({
